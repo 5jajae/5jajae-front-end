@@ -43,4 +43,3 @@ jobs:
           description: "5jajae-front-end 배포 ${{ job.status == 'success' && '성공' || '실패' }}하였습니다."
           status: ${{ job.status }}
           color: ${{ job.status == 'success' && 0x00ff00 || 0xff0000 }}
-          username: 'Deploy Bot'
