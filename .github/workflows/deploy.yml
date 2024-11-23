@@ -1,7 +1,5 @@
 name: Deploy
 
-
-
 on:
   push:
     branches: ['main']
@@ -35,3 +33,14 @@ jobs:
 
       - name: Test get variable exported by push-to-another-repository
         run: echo $DESTINATION_CLONED_DIRECTORY
+
+      - name: Discord Notification
+        uses: sarisia/actions-status-discord@v1
+        if: always()
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          title: '프론트엔드 배포 알림'
+          description: "5jajae-front-end 배포 ${{ job.status == 'success' && '성공' || '실패' }}하였습니다."
+          status: ${{ job.status }}
+          color: ${{ job.status == 'success' && 0x00ff00 || 0xff0000 }}
+          username: 'Deploy Bot'
