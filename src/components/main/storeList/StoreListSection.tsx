@@ -1,52 +1,65 @@
-import styled, { css } from 'styled-components';
-import { StoreListItemType } from '~/api/store/storeApi.types';
+import styled from 'styled-components';
 import StoreListItem from './StoreListItem';
 import { useIsScrolled } from '~/hooks/useIsScrolled';
 import { useRef } from 'react';
+import StoreListHeader from './StoreListHeader';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { useCommonStore } from '~/store/common';
+import { storeQueries } from '~/queries/storeQueries';
+import { useRouter } from 'next/router';
 
 interface Props {
-  stores: StoreListItemType[];
-  onStoreMarkerActive: (storeId: number) => void;
+  onStoreMarkerActive?: (storeId: number) => void;
   activeStoreId?: number;
 }
-const StoreListSection = ({ stores, activeStoreId, onStoreMarkerActive }: Props) => {
-  const ref = useRef<HTMLDivElement>(null);
+const StoreListSection = ({ activeStoreId, onStoreMarkerActive }: Props) => {
+  const router = useRouter();
+  const { itemTagId } = router.query as { itemTagId: string };
 
+  const ref = useRef<HTMLDivElement>(null);
   const isScrolled = useIsScrolled(ref);
 
+  const { lat, lng } = useCommonStore((state) => state.addressInfo);
+  const sort = useCommonStore((state) => state.sort);
+
+  const { data: storeListData } = useSuspenseQuery({
+    ...storeQueries.list({ sort, lat, lng, itemTagId }),
+    select: (data) => data.stores,
+  });
+
   return (
-    <Wrapper ref={ref} $isScrolled={isScrolled}>
-      {stores.map((store) => {
-        const uniqueKey = `store-list-item-${store.id}`;
-        return (
-          <StoreListItem
-            key={uniqueKey}
-            store={store}
-            onStoreMarkerActive={onStoreMarkerActive}
-            activeStoreId={activeStoreId}
-          />
-        );
-      })}
+    <Wrapper>
+      <StoreListHeader storesCount={storeListData.length} isScrolled={isScrolled} />
+      <StoreListWrapper ref={ref}>
+        {storeListData.map((store) => {
+          const uniqueKey = `store-list-item-${store.id}`;
+          return (
+            <StoreListItem
+              key={uniqueKey}
+              store={store}
+              onStoreMarkerActive={onStoreMarkerActive}
+              activeStoreId={activeStoreId}
+            />
+          );
+        })}
+      </StoreListWrapper>
     </Wrapper>
   );
 };
 
-const Wrapper = styled.div<{ $isScrolled: boolean }>`
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
   flex: 1;
+`;
+const StoreListWrapper = styled.div`
   padding-bottom: 120px;
   overflow-y: scroll;
-
   &::-webkit-scrollbar {
-    display: none; /* 스크롤바를 숨깁니다 */
+    display: none;
   }
-  scrollbar-width: none; /* 스크롤바 너비를 없앱니다 */
-  -ms-overflow-style: none; /* Internet Explorer 및 Edge(구버전)에서 스크롤바를 숨깁니다 */
-
-  ${({ $isScrolled, theme }) =>
-    $isScrolled &&
-    css`
-      border-top: solid 1px ${theme.colors.cool_gray_200};
-    `}
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 `;
 
 export default StoreListSection;

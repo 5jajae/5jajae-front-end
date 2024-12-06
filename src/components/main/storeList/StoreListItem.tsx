@@ -10,28 +10,26 @@ import { meterToKilometer } from '~/lib';
 
 interface Props {
   store: StoreListItemType;
-  onStoreMarkerActive: (storeId: number) => void;
+  onStoreMarkerActive?: (storeId: number) => void;
   activeStoreId?: number;
 }
 const StoreListItem = ({ store, onStoreMarkerActive, activeStoreId }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  const active = store.id === activeStoreId;
-
   const handleClick = () => {
-    onStoreMarkerActive(store.id);
+    // onStoreMarkerActive(store.id);
     router.push({ pathname: router.pathname, query: { ...router.query, storeId: store.id } });
   };
 
-  useEffect(() => {
-    if (activeStoreId === store.id) {
-      ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  }),
-    [activeStoreId];
+  // useEffect(() => {
+  //   if (activeStoreId === store.id) {
+  //     ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  //   }
+  // }),
+  //   [activeStoreId];
   return (
-    <Wrapper onClick={handleClick} ref={ref} $active={active}>
+    <Wrapper onClick={handleClick} ref={ref}>
       <CustomImage
         width="136px"
         height="136px"
@@ -77,12 +75,13 @@ const StoreListItem = ({ store, onStoreMarkerActive, activeStoreId }: Props) => 
   );
 };
 
-const Wrapper = styled.div<{ $active: boolean }>`
+const Wrapper = styled.div`
   padding: 8px 20px;
 
   display: flex;
   gap: 16px;
-  background-color: ${({ $active, theme }) => ($active ? theme.colors.cool_gray_50 : theme.colors.white)};
+  /* background-color: ${({ $active, theme }) => ($active ? theme.colors.cool_gray_50 : theme.colors.white)}; */
+  background-color: ${({ theme }) => theme.colors.white};
 
   &:hover {
     cursor: pointer;

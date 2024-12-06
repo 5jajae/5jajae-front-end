@@ -1,25 +1,15 @@
 import styled from 'styled-components';
 import SearchSection from '../search/SearchSection';
 import StoreListSection from './StoreListSection';
-import StoreListTitle from './StoreListTitle';
-import { StoreListItemType } from '~/api/store/storeApi.types';
+import { Suspense } from 'react';
 
-interface Props {
-  stores?: StoreListItemType[];
-  onStoreMarkerActive: (storeId: number) => void;
-  activeStoreId?: number;
-}
-const StoreListSide = ({ stores, activeStoreId, onStoreMarkerActive }: Props) => {
+const StoreListSide = () => {
   return (
     <Wrapper>
-      <div>
-        <SearchSection />
-        {stores && <StoreListTitle storesCount={stores.length} />}
-      </div>
-
-      {stores && (
-        <StoreListSection stores={stores} onStoreMarkerActive={onStoreMarkerActive} activeStoreId={activeStoreId} />
-      )}
+      <SearchSection />
+      <Suspense fallback={<></>}>
+        <StoreListSection />
+      </Suspense>
     </Wrapper>
   );
 };
