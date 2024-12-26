@@ -5,11 +5,14 @@ import useNaverMap from '../hooks/useNaverMap';
 import styled from 'styled-components';
 import ButtonGroup from './ButtonGroup';
 import { useEffect } from 'react';
+import { makeMarkerClustering } from './marker-cluster';
+import { getClusterIcon } from './generateHtml';
 
 interface Props {
-  itemTagId?: string;
+  itemTagIds?: string;
 }
-const StoreMap = ({ itemTagId }: Props) => {
+
+const StoreMap = ({ itemTagIds }: Props) => {
   const {
     map,
     markers,
@@ -32,7 +35,7 @@ const StoreMap = ({ itemTagId }: Props) => {
   const guideIsShow = useCommonStore((state) => state.showGuide.circle);
 
   const { data: storeListData } = useQuery({
-    ...storeQueries.list({ sort, lat: addressInfo.lat, lng: addressInfo.lng, itemTagId }),
+    ...storeQueries.list({ sort, lat: addressInfo.lat, lng: addressInfo.lng, itemTagIds }),
   });
 
   const handleLocation = () => {
@@ -85,6 +88,41 @@ const StoreMap = ({ itemTagId }: Props) => {
     }
   }, [map, guideIsShow]);
 
+  useEffect(() => {
+    if (map && markers) {
+      const htmlMarker1 = {
+        content: getClusterIcon('small'),
+        size: new naver.maps.Size(48, 48),
+        anchor: new naver.maps.Point(24, 24),
+      };
+
+      const htmlMarker2 = {
+        content: getClusterIcon('large'),
+        size: new naver.maps.Size(64, 64),
+        anchor: new naver.maps.Point(32, 32),
+      };
+      const MarkerClustering = makeMarkerClustering(window.naver);
+
+      const markerClustering = new MarkerClustering({
+        minClusterSize: 2,
+        maxZoom: 20,
+        map: map,
+        markers: markers.map((marker) => marker.marker),
+        disableClickZoom: false,
+        gridSize: 100,
+        icons: [htmlMarker1, htmlMarker1, htmlMarker2],
+        indexGenerator: [10, 100],
+        stylingFunction: (clusterMarker: any, count: number) => {
+          if (clusterMarker) {
+            const firstChild = clusterMarker.getElement().querySelector('div:first-child');
+            if (firstChild) {
+              firstChild.innerHTML = count;
+            }
+          }
+        },
+      });
+    }
+  }, [map, markers]);
 
   useEffect(() => {
     if (map && storeListData) {

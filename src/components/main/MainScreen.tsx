@@ -8,11 +8,11 @@ import StoreMap from './map/StoreMap';
 
 type QueryParamsType = {
   storeId?: string;
-  itemTagId?: string;
+  itemTagIds?: string;
 };
 const MainScreen = () => {
   const router = useRouter();
-  const { storeId, itemTagId } = router.query as QueryParamsType;
+  const { storeId, itemTagIds } = router.query as QueryParamsType;
 
   return (
     <Wrapper>
@@ -41,7 +41,7 @@ const MainScreen = () => {
           <StoreListSide />
         </StoreListSlideContainer>
 
-        <StoreMap itemTagId={itemTagId} />
+        <StoreMap itemTagIds={itemTagIds} />
       </ContentWrapper>
     </Wrapper>
   );

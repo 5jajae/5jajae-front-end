@@ -14,7 +14,7 @@ interface Props {
 }
 const StoreListSection = ({ activeStoreId, onStoreMarkerActive }: Props) => {
   const router = useRouter();
-  const { itemTagId } = router.query as { itemTagId: string };
+  const { itemTagIds } = router.query as { itemTagIds: string };
 
   const ref = useRef<HTMLDivElement>(null);
   const isScrolled = useIsScrolled(ref);
@@ -23,7 +23,7 @@ const StoreListSection = ({ activeStoreId, onStoreMarkerActive }: Props) => {
   const sort = useCommonStore((state) => state.sort);
 
   const { data: storeListData } = useSuspenseQuery({
-    ...storeQueries.list({ sort, lat, lng, itemTagId }),
+    ...storeQueries.list({ sort, lat, lng, itemTagIds }),
     select: (data) => data.stores,
   });
 
