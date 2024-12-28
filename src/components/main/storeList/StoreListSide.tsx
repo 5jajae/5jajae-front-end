@@ -2,14 +2,16 @@ import styled from 'styled-components';
 import SearchSection from '../search/SearchSection';
 import StoreListSection from './StoreListSection';
 import { Suspense } from 'react';
+import { StoreListItemType } from '~/api/store/storeApi.types';
 
-const StoreListSide = () => {
+interface Props {
+  stores: StoreListItemType[];
+}
+const StoreListSide = ({ stores }: Props) => {
   return (
     <Wrapper>
       <SearchSection />
-      <Suspense fallback={<></>}>
-        <StoreListSection />
-      </Suspense>
+      <StoreListSection stores={stores}/>
     </Wrapper>
   );
 };

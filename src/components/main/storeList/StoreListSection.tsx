@@ -3,44 +3,22 @@ import StoreListItem from './StoreListItem';
 import { useIsScrolled } from '~/hooks/useIsScrolled';
 import { useRef } from 'react';
 import StoreListHeader from './StoreListHeader';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { useCommonStore } from '~/store/common';
-import { storeQueries } from '~/queries/storeQueries';
-import { useRouter } from 'next/router';
+import { StoreListItemType } from '~/api/store/storeApi.types';
 
 interface Props {
-  onStoreMarkerActive?: (storeId: number) => void;
-  activeStoreId?: number;
+  stores: StoreListItemType[];
 }
-const StoreListSection = ({ activeStoreId, onStoreMarkerActive }: Props) => {
-  const router = useRouter();
-  const { itemTagIds } = router.query as { itemTagIds: string };
-
+const StoreListSection = ({ stores }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
   const isScrolled = useIsScrolled(ref);
 
-  const { lat, lng } = useCommonStore((state) => state.addressInfo);
-  const sort = useCommonStore((state) => state.sort);
-
-  const { data: storeListData } = useSuspenseQuery({
-    ...storeQueries.list({ sort, lat, lng, itemTagIds }),
-    select: (data) => data.stores,
-  });
-
   return (
     <Wrapper>
-      <StoreListHeader storesCount={storeListData.length} isScrolled={isScrolled} />
+      <StoreListHeader storesCount={stores.length} isScrolled={isScrolled} />
       <StoreListWrapper ref={ref}>
-        {storeListData.map((store) => {
+        {stores.map((store) => {
           const uniqueKey = `store-list-item-${store.id}`;
-          return (
-            <StoreListItem
-              key={uniqueKey}
-              store={store}
-              onStoreMarkerActive={onStoreMarkerActive}
-              activeStoreId={activeStoreId}
-            />
-          );
+          return <StoreListItem key={uniqueKey} store={store} />;
         })}
       </StoreListWrapper>
     </Wrapper>

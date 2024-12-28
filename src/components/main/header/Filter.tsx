@@ -16,7 +16,7 @@ const Filter = () => {
   const handleFilterToggleAll = () => {
     if (itemTagIds) {
       const query = { ...router.query };
-      delete query.itemTagId;
+      delete query.itemTagIds;
       router.replace({ pathname: router.pathname, query });
     }
   };
