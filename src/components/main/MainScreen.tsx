@@ -12,6 +12,7 @@ import { storeQueries } from '~/queries/storeQueries';
 import { commonActions, useCommonStore } from '~/store/common';
 import ButtonGroup from './map/ButtonGroup';
 import {
+  getCenterMarkerHtml,
   getClusterMarkerHtml,
   getGuideInfoWindowHtml,
   getStoreInfoWindowHtml,
@@ -38,6 +39,7 @@ const MainScreen = () => {
   const [clusters, setClusters] = useState<any>();
 
   const infoWindowRef = useRef<naver.maps.InfoWindow | null>(null);
+  const centerMarkerRef = useRef<naver.maps.Marker | null>(null);
 
   const [prevStore, setPrevStore] = useState<StoreMarker>();
   // 현재 active 된 store. 이 값이 있을 땐 storeId가 세팅되어 있음.
@@ -54,7 +56,13 @@ const MainScreen = () => {
     select: (data) => data.stores,
   });
 
-  const renderInfoWindow = (data: StoreListItemType) => {
+  const handleCenterMove = () => {
+    if (map) {
+      const centerPosition = new naver.maps.LatLng(addressInfo.lat, addressInfo.lng);
+      map.setCenter(centerPosition);
+    }
+  };
+  const getStoreInfoWindow = (data: StoreListItemType) => {
     const infoWindow = new naver.maps.InfoWindow({
       content: getStoreInfoWindowHtml(data),
       borderWidth: 0,
@@ -86,6 +94,38 @@ const MainScreen = () => {
     return infoWindow;
   };
 
+  const handleLocationSet = () => {
+    const handleLocationSuccess = (position: GeolocationPosition) => {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+
+      const centerLocation = new naver.maps.LatLng(lat, lng);
+      naver.maps.Service.reverseGeocode(
+        {
+          coords: centerLocation,
+        },
+        function (status, response) {
+          if (status !== naver.maps.Service.Status.OK) {
+            return alert('주소를 변환하는데 실패하였습니다.');
+          }
+
+          const result = response.v2;
+          const address = result.address.jibunAddress;
+
+          commonActions.setAddress(address);
+        },
+      );
+    };
+
+    const handleLocationError = (error: GeolocationPositionError) => {
+      commonActions.resetAddress();
+    };
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(handleLocationSuccess, handleLocationError);
+    }
+  };
+
   const handleZoomIn = () => {
     if (map && map.getMaxZoom() !== map.getZoom()) {
       map.setZoom(map.getZoom() + 1, true);
@@ -109,7 +149,33 @@ const MainScreen = () => {
     });
 
     setMap(mapElement);
+    // 주소 최초 세팅
+    handleLocationSet();
+
+    return () => {
+      map?.destroy();
+    };
   }, []);
+
+  useEffect(() => {
+    if (centerMarkerRef.current) {
+      centerMarkerRef.current.setMap(null);
+    }
+
+    if (map && addressInfo) {
+      const centerPosition = new naver.maps.LatLng(addressInfo.lat, addressInfo.lng);
+      map.setCenter(centerPosition);
+
+      const centerMarker = new naver.maps.Marker({
+        map,
+        icon: getCenterMarkerHtml(),
+        position: centerPosition,
+        zIndex: 1000,
+      });
+
+      centerMarkerRef.current = centerMarker;
+    }
+  }, [map, addressInfo]);
 
   /** 사용 가이드 렌더링 로직. 지도가 로드 되었고, 가이드 노출 조건이 성립할 때 실행한다. */
   useEffect(() => {
@@ -256,7 +322,7 @@ const MainScreen = () => {
         );
 
         /** 마커 인포 윈도우 열기 */
-        const infoWindow = renderInfoWindow(target.data);
+        const infoWindow = getStoreInfoWindow(target.data);
         infoWindow.open(map, target.marker);
         infoWindowRef.current = infoWindow;
 
@@ -309,11 +375,13 @@ const MainScreen = () => {
           )}
         </AnimatePresence>
 
-        <StoreListSlideContainer>{storesData && <StoreListSide stores={storesData} />}</StoreListSlideContainer>
+        <StoreListSlideContainer>
+          <StoreListSide stores={storesData} />
+        </StoreListSlideContainer>
 
         <MapWrapper>
           <div id="map" style={{ width: '100%', height: '100%' }}></div>
-          <ButtonGroup onCurrentLocationSet={() => {}} onZoomIn={handleZoomIn} onZoomOut={handleZoomOut} />
+          <ButtonGroup onCurrentLocationSet={handleCenterMove} onZoomIn={handleZoomIn} onZoomOut={handleZoomOut} />
         </MapWrapper>
       </ContentWrapper>
     </Wrapper>

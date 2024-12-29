@@ -1,17 +1,16 @@
 import styled from 'styled-components';
 import SearchSection from '../search/SearchSection';
 import StoreListSection from './StoreListSection';
-import { Suspense } from 'react';
 import { StoreListItemType } from '~/api/store/storeApi.types';
 
 interface Props {
-  stores: StoreListItemType[];
+  stores?: StoreListItemType[];
 }
 const StoreListSide = ({ stores }: Props) => {
   return (
     <Wrapper>
       <SearchSection />
-      <StoreListSection stores={stores}/>
+      {stores && <StoreListSection stores={stores} />}
     </Wrapper>
   );
 };
