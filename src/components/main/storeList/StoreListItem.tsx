@@ -41,7 +41,7 @@ const StoreListItem = ({ store }: Props) => {
         </Text>
         {store.descriptions && (
           <Text variant="label_2" weight="regular" color="cool_gray_500" truncateLines={2}>
-            {store.descriptions}
+            {store.descriptions.replace(/\n/g, '')}
           </Text>
         )}
         {store.address && (
