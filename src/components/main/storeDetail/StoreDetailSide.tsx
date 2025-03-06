@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { flexBetweenCenter, hideScrollBar } from '~/style/mixins';
 import IconButton from '../../common/buttons/IconButton';
-import { Close, Copy, Share } from '../../common/icons';
+import { Close, Copy } from '../../common/icons';
 import Text from '../../common/Text';
 import CustomImage from '../../common/CustomImage';
 import Badge from '../../common/Badge';
@@ -9,8 +9,6 @@ import ContentDivider from '../../common/ContentDivider';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import StoreContactDialog from './StoreContactDialog';
-import SolidButton from '~/components/common/buttons/SolidButton';
-import IconContainedButton from '~/components/common/buttons/IconContainedButton';
 import copyText from '~/lib/copyText';
 import ImageSlide from '~/components/common/ImageSlide';
 import useDashboard from '../hooks/useDashboard';
@@ -69,13 +67,13 @@ const StoreDetailSide = () => {
         siteUrl={`https://ojajae.com?storeId=${storeId}`}
       />
       <Wrapper>
-        <ContentWrapper>
-          <Title>
-            <Text variant="heading_1" weight="bold" color="cool_gray_900">
-              업체 정보
-            </Text>
-            <IconButton onClick={handleClose} icon={<Close color="cool_gray_950" />} />
-          </Title>
+        <HeaderSection>
+          <Text variant="heading_1" weight="bold" color="cool_gray_900">
+            업체 정보
+          </Text>
+          <IconButton onClick={handleClose} icon={<Close color="cool_gray_950" />} />
+        </HeaderSection>
+        <ContentSection>
           <StoreImageSlide>
             {storeDetailData.imageUrls.length === 0 && (
               <CustomImage
@@ -110,7 +108,7 @@ const StoreDetailSide = () => {
             {storeDetailData.representativeName && (
               <StoreInfoDetailItem title="대표자명" label={storeDetailData.representativeName} />
             )}
-            <StoreInfoDetailItem title="상세품목" label={storeDetailData.items} />
+            {storeDetailData.items && <StoreInfoDetailItem title="상세품목" label={storeDetailData.items} />}
 
             {storeDetailData.openingHours && (
               <StoreInfoDetailItem title="영업시간" label={storeDetailData.openingHours} />
@@ -141,9 +139,10 @@ const StoreDetailSide = () => {
               />
             )}
           </StoreInfoDetail>
-        </ContentWrapper>
-
-        <ButtonGroup storeId={storeId} onContactOpen={handleContactOpen} />
+        </ContentSection>
+        <ButtonSection>
+          <ButtonGroup storeId={storeId} onContactOpen={handleContactOpen} />
+        </ButtonSection>
 
         {storeDetailData.contactNumber && contactOpen && (
           <StoreContactDialog
@@ -167,16 +166,24 @@ const Wrapper = styled.div`
   box-sizing: border-box;
   border-right: solid 1px ${({ theme }) => theme.colors.cool_gray_200};
   background-color: ${({ theme }) => theme.colors.white};
+  overflow-y: scroll;
+
+  display: flex;
+  flex-direction: column;
 `;
 
-const ContentWrapper = styled.div`
-  overflow-y: scroll;
-  ${hideScrollBar}
-`;
-const Title = styled.div`
+const HeaderSection = styled.div`
   ${flexBetweenCenter}
 `;
 
+const ContentSection = styled.div`
+  flex: 1;
+  overflow-y: scroll;
+  padding-bottom: 120px;
+  ${hideScrollBar}
+`;
+
+const ButtonSection = styled.div``;
 const StoreImageSlide = styled.div`
   margin-top: 20px;
 `;
