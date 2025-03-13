@@ -8,3 +8,5 @@ export { default as Pin } from './Pin';
 export { default as Search } from './Search';
 export { default as Share } from './Share';
 export { default as Time } from './Time';
+export { default as BookmarkOutline } from './BookmarkOutline';
+export { default as BookmarkFill } from './BookmarkFill';

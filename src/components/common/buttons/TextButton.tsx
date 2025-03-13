@@ -19,6 +19,7 @@ const TextButton = ({ icon, textColor, children, disabled, ...attr }: Props) => 
 
 const Wrapper = styled.button`
   display: flex;
+  align-items: center;
   cursor: pointer;
   border: none;
   background-color: transparent;
