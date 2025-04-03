@@ -47,13 +47,13 @@ const Wrapper = styled.div`
   gap: 8px;
 
   box-sizing: border-box;
-  padding: 0 32px;
+  /* padding: 0 32px; */
   width: 100%;
   flex-wrap: wrap;
   overflow-x: scroll;
-  height: 72px;
+  /* height: 72px; */
 
-  border-bottom: solid 1px ${({ theme }) => theme.colors.cool_gray_200};
+  /* border-bottom: solid 1px ${({ theme }) => theme.colors.cool_gray_200}; */
 
   &::-webkit-scrollbar {
     display: none; /* 스크롤바를 숨깁니다 */

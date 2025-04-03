@@ -6,11 +6,18 @@ const Header = () => {
   return (
     <Wrapper>
       <GNB />
-      <Filter />
+      <FilterWrapper>
+        <Filter />
+      </FilterWrapper>
     </Wrapper>
   );
 };
 
 const Wrapper = styled.div``;
+
+const FilterWrapper = styled.div`
+  padding: 0 32px;
+  border-bottom: solid 1px ${({ theme }) => theme.colors.cool_gray_200};
+`;
 
 export default Header;

@@ -17,6 +17,7 @@ const Wrapper = styled.div`
   border-radius: 4px;
   padding: 4px 6px;
   white-space: nowrap;
+  width: fit-content;
 `;
 
 export default Badge;
